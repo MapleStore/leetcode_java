@@ -1,47 +1,33 @@
 package darren.gong.leetcode;
 
+import java.util.Arrays;
+
 public class MinOperations_1775 {
   public int minOperations(int[] nums1, int[] nums2) {
-    int sum1 = 0;
-    int[] count1 = new int[7];
-    for (int num1 : nums1) {
-      sum1 += num1;
-      count1[num1]++;
-    }
-    int sum2 = 0;
-    int[] count2 = new int[7];
-    for (int num2 : nums2) {
-      sum2 += num2;
-      count2[num2]++;
-    }
+    Arrays.sort(nums1);
+    Arrays.sort(nums2);
+    int sum1 = Arrays.stream(nums1).sum();
+    int sum2 = Arrays.stream(nums2).sum();
     if (sum1 == sum2) {
       return 0;
     }
-    int distance = Math.abs(sum1-sum2);
     if (sum1 < sum2) {
-      int[] temp = count1;
-      count1 = count2;
-      count2 = temp;
+      int[] temp = nums1;
+      nums1 = nums2;
+      nums2 = temp;
     }
+    int count = Math.abs(sum1-sum2);
     int result = 0;
-    // count1 bigger
-    for (int i = 1; i < 6; i++) {
-      int oneVal = (6-i);
-      int val = oneVal*count1[7-i];
-      if (val >= distance) {
-        return result+(distance%oneVal == 0 ? (distance/oneVal) : (distance/oneVal)+1);
+    int index1 = nums1.length-1;
+    int index2 = 0;
+    while (index1 >= 0 || index2 < nums2.length) {
+      if (index1 < 0 || (index2 < nums2.length && 6-nums2[index2] > nums1[index1]-1)) {
+        count -= 6-nums2[index2++];
       } else {
-        distance -= val;
-        result += count1[7-i];
+        count -= nums1[index1--]-1;
       }
-
-      val = oneVal*count2[i];
-      if (val >= distance) {
-        return (distance%oneVal == 0) ? result+(distance/oneVal) : result+(distance/oneVal)+1;
-      } else {
-        distance -= val;
-        result += count2[i];
-      }
+      result++;
+      if (count <= 0) return result;
     }
     return -1;
   }
